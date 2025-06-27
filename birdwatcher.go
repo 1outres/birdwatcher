@@ -10,7 +10,6 @@ import (
 
 	"github.com/alice-lg/birdwatcher/bird"
 	"github.com/alice-lg/birdwatcher/endpoints"
-	"github.com/gorilla/handlers"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -209,7 +208,7 @@ func main() {
 	myquerylog := log.New(os.Stdout, "", 0)
 	// Disable timestamps, as they are contained in the query log
 	myquerylog.SetFlags(myquerylog.Flags() &^ (log.Ldate | log.Ltime))
-	mylogger := &MyLogger{myquerylog}
+	// mylogger := &MyLogger{myquerylog}
 
 	go Housekeeping(conf.Housekeeping, !(bird.CacheConf.UseRedis)) // expire caches only for MemoryCache
 
@@ -217,8 +216,8 @@ func main() {
 		if len(conf.Server.Crt) == 0 || len(conf.Server.Key) == 0 {
 			log.Fatalln("You have enabled TLS support but not specified both a .crt and a .key file in the config.")
 		}
-		log.Fatal(http.ListenAndServeTLS(birdConf.Listen, conf.Server.Crt, conf.Server.Key, handlers.LoggingHandler(mylogger, r)))
+		log.Fatal(http.ListenAndServeTLS(birdConf.Listen, conf.Server.Crt, conf.Server.Key, r))
 	} else {
-		log.Fatal(http.ListenAndServe(birdConf.Listen, handlers.LoggingHandler(mylogger, r)))
+		log.Fatal(http.ListenAndServe(birdConf.Listen, r))
 	}
 }
